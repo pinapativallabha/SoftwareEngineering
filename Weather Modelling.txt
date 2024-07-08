@@ -1,0 +1,74 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import curve_fit
+
+# Define a quadratic function
+def quadratic_function(t, a, b, c):
+    return a * (t ** 2) + b * t + c
+
+# Function to read input from a file and fit quadratic curve to data
+def process_weather_data(option):
+    months = []
+    temperatures = []
+
+    if option == 1:
+        # Option 1: Read from a file
+        filename = 'weather_data.txt'
+        with open(filename, 'r') as file:
+            lines = file.readlines()
+            for line in lines:
+                month, temperature = line.strip().split()
+                months.append(float(month))
+                temperatures.append(float(temperature))
+
+    elif option == 2:
+        # Option 2: Hard-coded variables (example data)
+        months = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
+        temperatures = np.array([15.0, 17.5, 20.0, 22.5, 25.0, 27.5, 30.0, 29.0, 26.5, 23.5, 20.5, 17.5])
+
+    elif option == 3:
+        # Option 3: Input from keyboard
+        print("Enter months and temperatures. Type 'done' when finished.")
+        while True:
+            month_input = input("Month (or 'done'): ")
+            if month_input.lower() == 'done':
+                break
+            temperature_input = input("Temperature: ")
+            months.append(float(month_input))
+            temperatures.append(float(temperature_input))
+
+    else:
+        print("Invalid option. Exiting.")
+        return
+
+    # Perform curve fitting to find coefficients a, b, c
+    popt, pcov = curve_fit(quadratic_function, months, temperatures)
+    a, b, c = popt
+
+    # Print the coefficients found
+    print(f"Coefficients: a = {a}, b = {b}, c = {c}")
+
+    # Generate predicted temperatures using the fitted curve
+    predicted_temperatures = quadratic_function(months, *popt)
+
+    # Plotting the data and fitted curve
+    plt.figure(figsize=(10, 6))
+    plt.scatter(months, temperatures, color='b', label='Data')
+    plt.plot(months, predicted_temperatures, color='r', label='Quadratic Fit')
+    plt.title('Weather Modeling Using Quadratic Equation')
+    plt.xlabel('Month')
+    plt.ylabel('Temperature (degrees Celsius)')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+# Main program
+if __name__ == "__main__":
+    print("Choose how to input data:")
+    print("1. From a file")
+    print("2. Hard-coded variables")
+    print("3. Enter via keyboard")
+    option = int(input("Enter your choice (1/2/3): "))
+
+    process_weather_data(option)
